@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatBot</title>
+</head>
+<body>
+    <div class="chatbox">
+        <h2> Chatbot por Voz</h2>
+        <button onclick = "ouvir()">alar Agora</button>
+    </div>
+
+    <script>
+        //PERGUNTA UNICA QUE O BOT ENTENDE
+        const pergunta = "como você está.";
+
+        //RESPOSTA UNICA DO BOT
+        const resposta = "estou otimo! obrigado por perguntar.";
+
+        //FALAR EM VOZ
+        // função que faz o navegador "falar"
+        function falar(texto) {
+            const discurso = new SpeechSynthesisUtterance(texto);
+
+            //define o idioma da voz (portugues do brasil)
+            discurso.lang = "pt-br";
+
+            //define a velocidade da fala (1 = normal)
+            discurso.rate = 1;
+
+            //faz o navegador falar o texto informadpo
+            window.SpeechSynthesis.speak(discurso);
+        }
+
+        //funcao que escuta o que o usuario fala pelo microfone
+        function ouvir() {
+            //cria o reconhecedor de voz (apenas funciona o chrome)
+            const reconhecer = new webkitSpeechRecognition();
+
+            //define o idioma que sera reconhecido
+            reconhecer.lang = "pt-br";
+
+            //inicia a captura de voz
+            reconhecer.start();
+
+            //quando o usuario terminar de falar, esse evento é atividado
+            reconhecer.onresult = function(event ) {
+
+                //pega o texto que o usuario falou e trasnforma em minusculas
+                const textoFalado = event.result[0][0].transcript.toLowerCase();
+
+                //verifica se o texto que o usuario falo contem a pergunta esperada
+                if (textoFalado.includes(pergunta)) {
+                    // se sim,fala a resposta
+                    falar(resposta);
+                } else {
+
+                    //se nao,responde que nao enr=tendeu
+                    falar("desculpe, eu so enetdno a pergunta : como vc esta?");
+                }
+            };
+        }
+
+    </script>
+    
+</body>
+</html>
