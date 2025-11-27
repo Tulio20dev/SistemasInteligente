@@ -1,67 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatBot</title>
+<style>
+    body {
+        font-family: Arial;
+        background: #f0f0f0;
+        padding: 20px;
+    }
+    .chatbox {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        max-width: 400px;
+        margin: auto;
+        text-align: center;
+    }
+   
+    button {
+        margin-top: 10px;
+        padding: 10px;
+        width: 50%;
+        cursor: pointer;
+        background: #8e096f;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+</style>
 </head>
 <body>
     <div class="chatbox">
         <h2> Chatbot por Voz</h2>
-        <button onclick = "ouvir()">alar Agora</button>
+        <button onclick="ouvir()">Falar Agora</button>
+        <div id="respostaTexto" style="margin-top:12px;color:#333"></div>
     </div>
 
     <script>
-        //PERGUNTA UNICA QUE O BOT ENTENDE
-        const pergunta = "como você está.";
+        // Pergunta e resposta
+        const pergunta = "como você está";
+        const resposta = "Estou ótimo! Obrigado por perguntar.";
 
-        //RESPOSTA UNICA DO BOT
-        const resposta = "estou otimo! obrigado por perguntar.";
-
-        //FALAR EM VOZ
-        // função que faz o navegador "falar"
+        // Função que fala (Text-to-Speech)
         function falar(texto) {
             const discurso = new SpeechSynthesisUtterance(texto);
-
-            //define o idioma da voz (portugues do brasil)
-            discurso.lang = "pt-br";
-
-            //define a velocidade da fala (1 = normal)
+            discurso.lang = "pt-BR";
             discurso.rate = 1;
-
-            //faz o navegador falar o texto informadpo
-            window.SpeechSynthesis.speak(discurso);
+            window.speechSynthesis.speak(discurso);
+            const el = document.getElementById("respostaTexto");
+            if (el) el.innerText = texto;
         }
 
-        //funcao que escuta o que o usuario fala pelo microfone
+        // Função que escuta (Speech Recognition)
         function ouvir() {
-            //cria o reconhecedor de voz (apenas funciona o chrome)
-            const reconhecer = new webkitSpeechRecognition();
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                falar("Seu navegador não suporta reconhecimento de voz.");
+                return;
+            }
 
-            //define o idioma que sera reconhecido
-            reconhecer.lang = "pt-br";
-
-            //inicia a captura de voz
+            const reconhecer = new SpeechRecognition();
+            reconhecer.lang = "pt-BR";
             reconhecer.start();
 
-            //quando o usuario terminar de falar, esse evento é atividado
-            reconhecer.onresult = function(event ) {
-
-                //pega o texto que o usuario falou e trasnforma em minusculas
-                const textoFalado = event.result[0][0].transcript.toLowerCase();
-
-                //verifica se o texto que o usuario falo contem a pergunta esperada
+            reconhecer.onresult = function(event) {
+                const textoFalado = event.results[0][0].transcript.toLowerCase();
                 if (textoFalado.includes(pergunta)) {
-                    // se sim,fala a resposta
                     falar(resposta);
                 } else {
-
-                    //se nao,responde que nao enr=tendeu
-                    falar("desculpe, eu so enetdno a pergunta : como vc esta?");
+                    falar("Desculpe, eu só entendo a pergunta: 'Como você está?' ");
                 }
             };
-        }
 
+            reconhecer.onerror = function(err) {
+                console.error('Erro no reconhecimento:', err);
+                falar('Ocorreu um erro ao reconhecer sua voz.');
+            };
+        }
     </script>
     
 </body>
